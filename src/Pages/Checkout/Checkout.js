@@ -1,20 +1,45 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import useServiceDetails from '../../hooks/useServiceDetails';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import auth from '../../firebase.init';
+import axios from 'axios';
 
 const Checkout = () => {
   const { serviceId } = useParams();
   const [service] = useServiceDetails(serviceId);
+  const [user]= useAuthState(auth)
+
+
+
+  // handle place order
+  const handlePlaceOrder = e => {
+    e.preventDefault();
+    const order = {
+      name: user.name,
+      email: user.email,
+      service: serviceId,
+      address: e.target.address.value,
+      phone: e.target.phone.value
+    }
+    axios.post('http://localhost:5000/order', order)
+    .then(response =>{
+      console.log(response)
+    })
+
+
+  }
+
 
   return (
     <div className='w-50 mx-auto'>
       <h2 className="text-center">Please order {service.name}</h2>
-      <form>
-        <input className='w-100 mb-2' type="text" name="name" id="name" required placeholder='Your Name'/>
+      <form onSubmit={handlePlaceOrder}>
+        <input className='w-100 mb-2' type="text" name="name" id="name" value={user.displayName} required placeholder='Your Name'/>
         <br />
-        <input className='w-100 mb-2' type="email" name="email" id="email" required placeholder='YOur Email'/>
+        <input className='w-100 mb-2' type="email" name="email" id="email" value={user.email} required placeholder='YOur Email'/>
         <br />
-        <input className='w-100 mb-2' type="text" name="service" id="service" required placeholder='Your Service'/>
+        <input className='w-100 mb-2' type="text" name="service" id="service" value={service.name} required placeholder='Your Service'/>
         <br />
         <input className='w-100 mb-2' type="text" name="address" id="address" required placeholder='Your Address'/>
         <br />
