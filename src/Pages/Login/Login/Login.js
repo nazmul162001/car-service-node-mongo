@@ -1,3 +1,5 @@
+// import { async } from '@firebase/util';
+import axios from 'axios';
 import React, { useRef } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import {
@@ -20,7 +22,7 @@ const Login = () => {
 
 
   if (user) {
-    navigate(from, { replace: true });
+    // navigate(from, { replace: true });
   }
 
   let errorMessage;
@@ -28,13 +30,18 @@ const Login = () => {
     errorMessage = <p className="text-danger">Error: {error.message}</p>;
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
 
     // console.log(email, password);
-    signInWithEmailAndPassword(email, password);
+   await signInWithEmailAndPassword(email, password);
+   const {data} = await axios.post('http://localhost:5000/login', {email});
+   localStorage.setItem('accessToken', data.accessToken);
+   console.log(email);
+   navigate(from, { replace: true });
+
   };
 
   const [sendPasswordResetEmail, sending] = useSendPasswordResetEmail(auth);

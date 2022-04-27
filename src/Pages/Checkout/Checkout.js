@@ -4,6 +4,7 @@ import useServiceDetails from '../../hooks/useServiceDetails';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import auth from '../../firebase.init';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Checkout = () => {
   const { serviceId } = useParams();
@@ -24,7 +25,11 @@ const Checkout = () => {
     }
     axios.post('http://localhost:5000/order', order)
     .then(response =>{
-      console.log(response)
+      const {data} = response;
+      if(data.insertedId){
+        toast.success('Your order is booked!!!')
+        e.target.reset();
+      }
     })
 
 
@@ -35,9 +40,9 @@ const Checkout = () => {
     <div className='w-50 mx-auto'>
       <h2 className="text-center">Please order {service.name}</h2>
       <form onSubmit={handlePlaceOrder}>
-        <input className='w-100 mb-2' type="text" name="name" id="name" value={user.displayName} required placeholder='Your Name'/>
+        <input className='w-100 mb-2' type="text" name="name" id="name" value={user?.displayName} required placeholder='Your Name'/>
         <br />
-        <input className='w-100 mb-2' type="email" name="email" id="email" value={user.email} required placeholder='YOur Email'/>
+        <input className='w-100 mb-2' type="email" name="email" id="email" value={user?.email} required placeholder='YOur Email'/>
         <br />
         <input className='w-100 mb-2' type="text" name="service" id="service" value={service.name} required placeholder='Your Service'/>
         <br />
